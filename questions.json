@@ -1,0 +1,37 @@
+[
+    {
+        "id": 1,
+        "philosopher": "Socrate",
+        "question": "Sono Socrate. So di non sapere, ma tu sai qual è il metodo che uso per far partorire la verità alle anime?",
+        "options": ["Maieutica", "Dialettica", "Logica", "Retorica"],
+        "correctIndex": 0
+    },
+    {
+        "id": 2,
+        "philosopher": "Platone",
+        "question": "Sono Platone. Nel mio mito della caverna, cosa rappresentano le ombre sul fondo?",
+        "options": ["La verità", "Le idee", "L'apparenza sensibile", "Il sole"],
+        "correctIndex": 2
+    },
+    {
+        "id": 3,
+        "philosopher": "Aristotele",
+        "question": "Sono Aristotele. L'uomo è per natura un animale...",
+        "options": ["Solitario", "Politico", "Divino", "Selvaggio"],
+        "correctIndex": 1
+    },
+    {
+        "id": 4,
+        "philosopher": "Cartesio",
+        "question": "Sono Cartesio. Cogito, ergo...",
+        "options": ["Sum", "Bibere", "Est", "Vivere"],
+        "correctIndex": 0
+    },
+    {
+        "id": 5,
+        "philosopher": "Nietzsche",
+        "question": "Sono Nietzsche. Dio è morto! E chi lo ha ucciso?",
+        "options": ["Il tempo", "La scienza", "Noi", "Il caso"],
+        "correctIndex": 2
+    }
+]

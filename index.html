@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Art Quiz Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="game-container">
+        <!-- UI Vite -->
+        <div id="ui-bar">
+            <span>VITE: <span id="lives-display">3</span></span>
+            <span style="margin-left: 20px;">LAUREA: <span id="score-display">0</span>/5</span>
+        </div>
+
+        <!-- Il Canvas di gioco 480x480 (30x30 tiles) -->
+        <canvas id="gameCanvas" width="480" height="480"></canvas>
+        
+        <!-- Schermata Iniziale -->
+        <div id="start-screen">
+            <h1>Laurea di Nicholas!</h1>
+            <div class="instructions-content">
+                <p>Usa <b>WASD</b> o le <b>Frecce</b> per muoverti.</p>
+                <p>Evita i proiettili di fuoco!</p>
+                <p>Parla con i <b>5 Filosofi</b> per rispondere alle loro domande.</p>
+            </div>
+            <button id="start-btn">INIZIA</button>
+        </div>
+
+        <!-- Schermata Game Over (nascosta) -->
+        <div id="game-over-screen" class="hidden">
+            <h1>GAME OVER</h1>
+            <p>Hai finito le vite!</p>
+            <button onclick="location.reload()">Riprova</button>
+        </div>
+    </div>
+
+    <!-- Popup Messaggi (Risposta corretta/sbagliata/Vittoria) -->
+    <div id="message-popup" class="hidden">
+        <h2 id="popup-title">Titolo</h2>
+        <p id="popup-text">Messaggio</p>
+        <button id="popup-btn">OK</button>
+    </div>
+
+    <!-- Overlay del Popup (nascosto di default) -->
+    <div id="popup-overlay" class="hidden">
+        <div id="popup-box">
+            <h2 id="popup-question">Testo della domanda qui...</h2>
+            <div id="popup-options">
+                <!-- I bottoni verranno generati via JS -->
+            </div>
+            <p id="popup-feedback"></p>
+            <button id="close-btn" class="hidden">Chiudi e Continua</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
