@@ -1,9 +1,9 @@
 // --- CONFIGURAZIONE (dinamica per responsive) ---
 let TILE_SIZE = 16; // iniziale, verrà ricalcolato
-const COLS = 20;  // ridotto da 30
-const ROWS = 20;  // ridotto da 30
-let CANVAS_WIDTH = 320; // ROWS * TILE_SIZE (aggiornato dinamicamente)
-let CANVAS_HEIGHT = 320;
+const COLS = 25;  // nuova mappa 25x25
+const ROWS = 25;  // nuova mappa 25x25
+let CANVAS_WIDTH = 400; // aggiornato dinamicamente
+let CANVAS_HEIGHT = 400;
 
 function resizeCanvas() {
     const uiBar = document.getElementById('ui-bar');
@@ -25,6 +25,15 @@ function resizeCanvas() {
     canvas.style.width = CANVAS_WIDTH + 'px';
     canvas.style.height = CANVAS_HEIGHT + 'px';
     if (uiBar) uiBar.style.width = CANVAS_WIDTH + 'px';
+    // Ridimensiona overlay start / game over / popup messaggi se presenti
+    const startScreen = document.getElementById('start-screen');
+    const gameOver = document.getElementById('game-over-screen');
+    [startScreen, gameOver].forEach(el => {
+        if (el) {
+            el.style.width = CANVAS_WIDTH + 'px';
+            el.style.height = CANVAS_HEIGHT + 'px';
+        }
+    });
 }
 
 window.addEventListener('resize', () => {
@@ -37,8 +46,8 @@ const ctx = canvas.getContext('2d');
 
 // Giocatore
 let player = { 
-    x: 10, // centro orizzontale nuova mappa 20x20
-    y: 18, 
+    x: Math.floor(COLS/2), // centro mappa 25x25
+    y: ROWS - 3, 
     lives: 3,
     isInvulnerable: false,
     invulnerableTimer: 0
@@ -198,29 +207,28 @@ function createMonasteryMap() {
     drawRect(0, 0, 1, ROWS, 1);
     drawRect(COLS - 1, 0, 1, ROWS, 1);
 
-    // Piccola scalinata centrale (visuale)
-    drawRect(7, 6, 6, 3, 3);
+    // Scalinata centrale (più grande per 25x25)
+    drawRect(9, 7, 7, 4, 3);
 
-    // Colonne decorative
-    for (let y = 3; y <= 15; y += 4) {
-        map[y][5] = 1;
-        map[y][14] = 1;
+    // Colonne decorative centrali (due file)
+    for (let y = 4; y <= 20; y += 4) {
+        map[y][7] = 1;
+        map[y][17] = 1;
     }
 
-    // Stanze laterali superiori
-    drawRect(0, 2, 5, 1, 1);
-    drawRect(COLS - 5, 2, 5, 1, 1);
-    // Stanze laterali inferiori
-    drawRect(0, ROWS - 5, 5, 1, 1);
-    drawRect(COLS - 5, ROWS - 5, 5, 1, 1);
+    // Stanze laterali (superiori + inferiori) ridimensionate
+    drawRect(0, 3, 6, 1, 1); // alto sx
+    drawRect(COLS - 6, 3, 6, 1, 1); // alto dx
+    drawRect(0, ROWS - 6, 6, 1, 1); // basso sx
+    drawRect(COLS - 6, ROWS - 6, 6, 1, 1); // basso dx
 
-    // Posizionamento Filosofi per nuova scala
+    // Posizionamento Filosofi (distribuiti simmetricamente)
     const philLocations = [
-        { x: 10, y: 3, id: 0 },  // Socrate centrale
-        { x: 3, y: 3, id: 1 },   // Platone alto sx
-        { x: 16, y: 3, id: 2 },  // Aristotele alto dx
-        { x: 3, y: 14, id: 3 },  // Cartesio basso sx
-        { x: 16, y: 14, id: 4 }  // Nietzsche basso dx
+        { x: Math.floor(COLS/2), y: 5, id: 0 },            // Socrate vicino scalinata
+        { x: 4, y: 5, id: 1 },                              // Platone
+        { x: COLS - 5, y: 5, id: 2 },                       // Aristotele
+        { x: 4, y: ROWS - 7, id: 3 },                       // Cartesio
+        { x: COLS - 5, y: ROWS - 7, id: 4 }                 // Nietzsche
     ];
 
     philLocations.forEach(loc => {
@@ -230,10 +238,14 @@ function createMonasteryMap() {
 
     // 6. Aggiungiamo Nemici (Diavoletti)
     enemies = [];
-    enemies.push({ x: 7, y: 8, type: 'horizontal', dir: 1, min: 6, max: 13, cooldown: 0 });
-    enemies.push({ x: 5, y: 12, type: 'vertical', dir: 1, min: 8, max: 15, cooldown: 0 });
-    enemies.push({ x: 14, y: 12, type: 'vertical', dir: -1, min: 8, max: 15, cooldown: 0 });
-    enemies.push({ x: 10, y: 6, type: 'horizontal', dir: 1, min: 8, max: 12, cooldown: 0 }); // vicino alla scala
+    // Pattuglie centrali
+    enemies.push({ x: 8, y: 10, type: 'horizontal', dir: 1, min: 7, max: 17, cooldown: 0 });
+    enemies.push({ x: 16, y: 10, type: 'horizontal', dir: -1, min: 7, max: 17, cooldown: 0 });
+    // Verticali laterali
+    enemies.push({ x: 6, y: 12, type: 'vertical', dir: 1, min: 8, max: 18, cooldown: 0 });
+    enemies.push({ x: 18, y: 12, type: 'vertical', dir: -1, min: 8, max: 18, cooldown: 0 });
+    // Guardiano scalinata
+    enemies.push({ x: Math.floor(COLS/2), y: 8, type: 'horizontal', dir: 1, min: Math.floor(COLS/2)-2, max: Math.floor(COLS/2)+2, cooldown: 0 });
 }
 
 createMonasteryMap();
@@ -311,38 +323,48 @@ function movePlayer(dx, dy) {
 }
 
 function updateEnemies() {
-    // Aggiorna ogni nemico
+    const now = Date.now();
     enemies.forEach(enemy => {
-        // Movimento semplice "pattuglia"
-        // Rallentiamo il movimento: si muovono ogni 10 frame circa? 
-        // Per semplicità nel tile-based, facciamo che si muovono "fluidamente" tra i tile
-        // Ma qui stiamo usando una logica a scatti per il player.
-        // Facciamo muovere i nemici lentamente in pixel coordinates per lo sparo, 
-        // ma per ora manteniamo la logica tile-based: si muovono ogni X frame del gioco.
-        
         if (!enemy.moveTimer) enemy.moveTimer = 0;
         enemy.moveTimer++;
 
-        if (enemy.moveTimer > 30) { // Si muove ogni 30 frame (circa 0.5 sec)
+        if (enemy.moveTimer > 30) {
             enemy.moveTimer = 0;
-            
+            let nextX = enemy.x;
+            let nextY = enemy.y;
             if (enemy.type === 'horizontal') {
-                enemy.x += enemy.dir;
-                if (enemy.x >= enemy.max || enemy.x <= enemy.min) enemy.dir *= -1;
+                nextX = enemy.x + enemy.dir;
+                if (nextX >= enemy.max || nextX <= enemy.min) {
+                    enemy.dir *= -1;
+                    nextX = enemy.x + enemy.dir; // prova nuova direzione
+                }
             } else {
-                enemy.y += enemy.dir;
-                if (enemy.y >= enemy.max || enemy.y <= enemy.min) enemy.dir *= -1;
+                nextY = enemy.y + enemy.dir;
+                if (nextY >= enemy.max || nextY <= enemy.min) {
+                    enemy.dir *= -1;
+                    nextY = enemy.y + enemy.dir;
+                }
+            }
+            // Collisione con muro
+            if (map[nextY] && map[nextY][nextX] !== undefined && map[nextY][nextX] !== 1) {
+                enemy.x = nextX;
+                enemy.y = nextY;
+            } else {
+                enemy.dir *= -1; // Inverte se muro
             }
         }
 
-        // Sparo
+        // Timer sparo
         if (!enemy.shootTimer) enemy.shootTimer = 0;
         enemy.shootTimer++;
-
-        if (enemy.shootTimer > 120) { // Spara ogni 2 secondi circa
+        if (enemy.shootTimer > 120) {
             enemy.shootTimer = 0;
             shootProjectile(enemy);
         }
+
+        // Animazione stato (per blinking occhi)
+        enemy.blink = (Math.floor(now / 400) % 2) === 0; // true/false alterna
+        enemy.hoverOffset = Math.sin(now / 500) * (TILE_SIZE * 0.05); // piccolo bobbing
     });
 }
 
@@ -546,38 +568,43 @@ function gameLoop() {
 
 // --- Nuovo Rendering Nemico: Diavoletto Professore ---
 function drawDevilProfessor(x, y) {
-    const s = TILE_SIZE / 16; // scala basata sul tile
+    const s = TILE_SIZE / 16;
+    // Recupera entità per animazione (hover/blink)
+    const enemy = enemies.find(e => e.x * TILE_SIZE === x && e.y * TILE_SIZE === y);
+    const hoverOffset = enemy ? enemy.hoverOffset || 0 : 0;
+    const blink = enemy ? enemy.blink : false;
+
     // Ombra
-    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
     ctx.beginPath();
-    ctx.ellipse(x + 8*s, y + 14*s, 6*s, 3*s, 0, 0, Math.PI*2);
+    ctx.ellipse(x + 8*s, y + 15*s, 6*s, 3*s, 0, 0, Math.PI*2);
     ctx.fill();
 
-    // Corpo (Mantello rosso scuro)
+    // Corpo
     ctx.fillStyle = '#7b1f1f';
-    ctx.fillRect(x + 4*s, y + 6*s, 8*s, 8*s);
+    ctx.fillRect(x + 4*s, y + 6*s + hoverOffset, 8*s, 8*s);
 
     // Testa
     ctx.fillStyle = '#f8d4b4';
-    ctx.fillRect(x + 5*s, y + 2*s, 6*s, 6*s);
+    ctx.fillRect(x + 5*s, y + 2*s + hoverOffset, 6*s, 6*s);
 
     // Corna
     ctx.fillStyle = '#ffeb3b';
-    ctx.fillRect(x + 5*s, y + 1*s, 2*s, 2*s);
-    ctx.fillRect(x + 9*s, y + 1*s, 2*s, 2*s);
+    ctx.fillRect(x + 5*s, y + 1*s + hoverOffset, 2*s, 2*s);
+    ctx.fillRect(x + 9*s, y + 1*s + hoverOffset, 2*s, 2*s);
 
-    // Occhiali (professore)
-    ctx.fillStyle = '#000';
-    ctx.fillRect(x + 6*s, y + 4*s, 1*s, 1*s);
-    ctx.fillRect(x + 8*s, y + 4*s, 1*s, 1*s);
+    // Occhi (lampeggio)
+    ctx.fillStyle = blink ? '#ff5252' : '#000';
+    ctx.fillRect(x + 6*s, y + 4*s + hoverOffset, 1*s, 1*s);
+    ctx.fillRect(x + 8*s, y + 4*s + hoverOffset, 1*s, 1*s);
     ctx.fillStyle = '#333';
-    ctx.fillRect(x + 6*s, y + 5*s, 3*s, 1*s);
+    ctx.fillRect(x + 6*s, y + 5*s + hoverOffset, 3*s, 1*s);
 
-    // Libro (fronte)
+    // Libro
     ctx.fillStyle = '#3e2723';
-    ctx.fillRect(x + 2*s, y + 8*s, 3*s, 4*s);
+    ctx.fillRect(x + 2*s, y + 8*s + hoverOffset, 3*s, 4*s);
     ctx.fillStyle = '#d7ccc8';
-    ctx.fillRect(x + 2*s, y + 8*s, 3*s, 1*s);
+    ctx.fillRect(x + 2*s, y + 8*s + hoverOffset, 3*s, 1*s);
 }
 
 // --- Nuovo Rendering Proiettile: "ESAMI" ---
@@ -586,18 +613,18 @@ function drawExamProjectile(x, y) {
     const h = TILE_SIZE * 0.5;
     const cx = x + TILE_SIZE/2 - w/2;
     const cy = y + TILE_SIZE/2 - h/2;
-    // Rettangolo scuro
     ctx.fillStyle = '#1b1b1b';
     ctx.fillRect(cx, cy, w, h);
     ctx.strokeStyle = '#ffeb3b';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = Math.max(1, TILE_SIZE * 0.08);
     ctx.strokeRect(cx, cy, w, h);
-    // Testo
     ctx.fillStyle = '#ffd700';
-    ctx.font = `${Math.max(8, Math.floor(TILE_SIZE/3))}px Courier New`;
+    const fontPx = Math.min(14, Math.max(6, Math.floor(TILE_SIZE / 2.6)));
+    ctx.font = `${fontPx}px Courier New`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('ESAMI', x + TILE_SIZE/2, y + TILE_SIZE/2);
+    const label = TILE_SIZE < 20 ? 'ES' : 'ESAMI';
+    ctx.fillText(label, x + TILE_SIZE/2, y + TILE_SIZE/2);
 }
 
 function draw() {
