@@ -236,16 +236,14 @@ function createMonasteryMap() {
         philosopherMap[`${loc.x},${loc.y}`] = loc.id;
     });
 
-    // 6. Aggiungiamo Nemici (Diavoletti)
+    // 6. Aggiungiamo Nemici (Diavoletti) - ridotti a 3
     enemies = [];
-    // Pattuglie centrali
-    enemies.push({ x: 8, y: 10, type: 'horizontal', dir: 1, min: 7, max: 17, cooldown: 0 });
-    enemies.push({ x: 16, y: 10, type: 'horizontal', dir: -1, min: 7, max: 17, cooldown: 0 });
-    // Verticali laterali
-    enemies.push({ x: 6, y: 12, type: 'vertical', dir: 1, min: 8, max: 18, cooldown: 0 });
-    enemies.push({ x: 18, y: 12, type: 'vertical', dir: -1, min: 8, max: 18, cooldown: 0 });
-    // Guardiano scalinata
-    enemies.push({ x: Math.floor(COLS/2), y: 8, type: 'horizontal', dir: 1, min: Math.floor(COLS/2)-2, max: Math.floor(COLS/2)+2, cooldown: 0 });
+    // Pattuglia orizzontale centrale lunga
+    enemies.push({ x: 8, y: 11, type: 'horizontal', dir: 1, min: 6, max: 18, cooldown: 0 });
+    // Verticale sinistra
+    enemies.push({ x: 6, y: 12, type: 'vertical', dir: 1, min: 8, max: 19, cooldown: 0 });
+    // Guardiano scalinata oscillante
+    enemies.push({ x: Math.floor(COLS/2), y: 8, type: 'horizontal', dir: 1, min: Math.floor(COLS/2)-3, max: Math.floor(COLS/2)+3, cooldown: 0 });
 }
 
 createMonasteryMap();
@@ -609,22 +607,23 @@ function drawDevilProfessor(x, y) {
 
 // --- Nuovo Rendering Proiettile: "ESAMI" ---
 function drawExamProjectile(x, y) {
-    const w = TILE_SIZE * 0.7;
-    const h = TILE_SIZE * 0.5;
+    const w = TILE_SIZE * 0.68;
+    const h = TILE_SIZE * 0.46;
     const cx = x + TILE_SIZE/2 - w/2;
     const cy = y + TILE_SIZE/2 - h/2;
-    ctx.fillStyle = '#1b1b1b';
+    // Rettangolo senza bordo
+    ctx.fillStyle = '#121212';
     ctx.fillRect(cx, cy, w, h);
-    ctx.strokeStyle = '#ffeb3b';
-    ctx.lineWidth = Math.max(1, TILE_SIZE * 0.08);
-    ctx.strokeRect(cx, cy, w, h);
-    ctx.fillStyle = '#ffd700';
-    const fontPx = Math.min(14, Math.max(6, Math.floor(TILE_SIZE / 2.6)));
+    // Glow interno semplice
+    ctx.fillStyle = '#222';
+    ctx.fillRect(cx+2, cy+2, w-4, h-4);
+    // Testo ESAME sempre completo
+    ctx.fillStyle = '#ffeb3b';
+    const fontPx = Math.min(Math.floor(TILE_SIZE/2.2), 16);
     ctx.font = `${fontPx}px Courier New`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    const label = TILE_SIZE < 20 ? 'ES' : 'ESAMI';
-    ctx.fillText(label, x + TILE_SIZE/2, y + TILE_SIZE/2);
+    ctx.fillText('ESAME', x + TILE_SIZE/2, y + TILE_SIZE/2);
 }
 
 function draw() {
