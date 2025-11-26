@@ -49,20 +49,9 @@ canvas {
     color: #ccc;
 }
 
-/* Schermata Game Over */
+/* Schermata Game Over (ora gestito da message-popup) */
 #game-over-screen {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%; /* Copre il canvas */
-    background: rgba(100, 0, 0, 0.9);
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 20;
+    display: none !important; /* Non più usato, sostituito da popup */
 }
 
 /* Popup Messaggi Globale */

@@ -434,7 +434,11 @@ function hitPlayer() {
 
 function gameOver() {
     isGameOver = true;
-    document.getElementById('game-over-screen').classList.remove('hidden');
+    isPaused = true;
+    stopGameMusic();
+    showMessagePopup("GAME OVER", "Hai finito le vite! Vuoi riprovare?", () => {
+        location.reload();
+    });
 }
 
 // --- GESTIONE DOMANDE ---
@@ -530,6 +534,17 @@ function checkAnswer(selectedIndex, correctIndex, tileKey) {
     } else {
         // Sbagliato
         playSound('wrong');
+        
+        // Rimuovi una vita
+        player.lives--;
+        document.getElementById('lives-display').textContent = player.lives;
+        
+        // Verifica Game Over
+        if (player.lives <= 0) {
+            document.getElementById('popup-overlay').classList.add('hidden');
+            gameOver();
+            return;
+        }
         
         // Mostra popup errore
         showMessagePopup("SBAGLIATO!", "Riprova, non arrenderti!", () => {
