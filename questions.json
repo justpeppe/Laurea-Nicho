@@ -2,36 +2,36 @@
     {
         "id": 1,
         "philosopher": "Socrate",
-        "question": "Sono Socrate. So di non sapere, ma tu sai qual è il metodo che uso per far partorire la verità alle anime?",
-        "options": ["Maieutica", "Dialettica", "Logica", "Retorica"],
+        "question": "Sono Socrate. So di non sapere, ma tu sai qual è il minimo ritardo che fai sempre?",
+        "options": ["1 ora", "Non faccio ritardo", "1 anno solare", "Non mi presento"],
         "correctIndex": 0
     },
     {
         "id": 2,
         "philosopher": "Platone",
-        "question": "Sono Platone. Nel mio mito della caverna, cosa rappresentano le ombre sul fondo?",
-        "options": ["La verità", "Le idee", "L'apparenza sensibile", "Il sole"],
-        "correctIndex": 2
+        "question": "Sono Platone. Nel mio mito della caverna, gli uomini avevano microfoni migliori del tuo, perchè?",
+        "options": ["Il 5G è sempre esistito nella caverna", "'Vabbè ma si sente'", "L'apparenza sensibile (avevamo finito le idee)", "Avevano una connessione Wi-Fi migliore della tua"],
+        "correctIndex": 1
     },
     {
         "id": 3,
         "philosopher": "Aristotele",
-        "question": "Sono Aristotele. L'uomo è per natura un animale...",
-        "options": ["Solitario", "Politico", "Divino", "Selvaggio"],
-        "correctIndex": 1
+        "question": "Sono Aristotele. Il tuo vero nome è...",
+        "options": ["Nicolle", "Turi", "Sasy", "Nicholasssssss"],
+        "correctIndex": 2
     },
     {
         "id": 4,
-        "philosopher": "Cartesio",
-        "question": "Sono Cartesio. Cogito, ergo...",
-        "options": ["Sum", "Bibere", "Est", "Vivere"],
-        "correctIndex": 0
+        "philosopher": "Caterina da Siena",
+        "question": "Sono Caterina da Siena. Quale concetto enfattizzo di più nei miei scritti?",
+        "options": ["Il famoso viaggio a Buenos Aires", "Sospetto universale", "La tua procrastinazione seriale", "Amore per Dio"],
+        "correctIndex": 3
     },
     {
         "id": 5,
         "philosopher": "Nietzsche",
         "question": "Sono Nietzsche. Dio è morto! E chi lo ha ucciso?",
-        "options": ["Il tempo", "La scienza", "Noi", "Il caso"],
-        "correctIndex": 2
+        "options": ["Il barbiere che ti ha distrutto i capelli", "'Non lo so, non me lo ricordo'", "UniCT", "Il tirocinio"],
+        "correctIndex": 1
     }
 ]

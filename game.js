@@ -100,41 +100,32 @@ function playSound(type) {
     }
 }
 
-// --- MUSICA DI GIOCO ---
-let bgMusicOscillators = [];
+// --- MUSICA DI GIOCO (file) ---
 let victoryPlayed = false;
+let bgMusicAudio = null;
 
 function startGameMusic() {
     stopGameMusic();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    const root = 220; // A3
-    const pattern = [0, 3, 7, 10]; // intervalli
-    for (let i = 0; i < pattern.length; i++) {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.value = root * Math.pow(2, pattern[i] / 12);
-        gain.gain.value = 0.05;
-        osc.connect(gain).connect(audioCtx.destination);
-        osc.start();
-        bgMusicOscillators.push({ osc, gain });
+    // Inizializza audio element se necessario
+    if (!bgMusicAudio) {
+        bgMusicAudio = new Audio('music.mp3');
+        bgMusicAudio.loop = true;
+        bgMusicAudio.volume = 0.4; // volume moderato
     }
-    // Leggera modulazione ritmica
-    let t = 0;
-    bgMusicOscillators.forEach((o, idx) => {
-        setInterval(() => {
-            const v = 0.04 + 0.01 * Math.sin((t + idx) * 0.5);
-            o.gain.gain.setTargetAtTime(v, audioCtx.currentTime, 0.2);
-            t += 0.05;
-        }, 300);
+    // Alcuni browser richiedono interazione utente già avvenuta
+    bgMusicAudio.currentTime = 0;
+    bgMusicAudio.play().catch(() => {
+        // Se blocca, verrà avviata al prossimo input
     });
 }
 
 function stopGameMusic() {
-    bgMusicOscillators.forEach(o => {
-        try { o.osc.stop(); } catch(e) {}
-    });
-    bgMusicOscillators = [];
+    if (bgMusicAudio) {
+        try {
+            bgMusicAudio.pause();
+            bgMusicAudio.currentTime = 0;
+        } catch (e) {}
+    }
 }
 
 function playVictoryMusic() {
@@ -528,6 +519,7 @@ function checkAnswer(selectedIndex, correctIndex, tileKey) {
             if (score >= 5) {
                 playSound('win');
                 playVictoryMusic();
+                stopGameMusic();
                 isPaused = true; // Ferma il gioco
                 showMessagePopup("COMPLIMENTI!", winMessage, () => {
                     location.reload(); // Riavvia
